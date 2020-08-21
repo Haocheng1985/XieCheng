@@ -10,6 +10,10 @@ namespace MyFakexiecheng.Services
     {
         IEnumerable<TouristRoute> GetTouristRoutes();
         TouristRoute GetTouristRoute(Guid touristRouteId);
+        bool TouristRouteExist(Guid touristRouteId);
+        IEnumerable<TouristRoutePicture> GetPicturesByTouristRouteId(Guid touristRouteId);
+
+        TouristRoutePicture GetPicture(int pictureId);
 
     }
 }
