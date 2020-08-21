@@ -24,10 +24,28 @@ namespace MyFakexiecheng.Services
             return _context.TouristRoutes.Include(t => t.TouristRoutePictures).FirstOrDefault(n => n.Id == touristRouteId);
         }
 
-        public IEnumerable<TouristRoute> GetTouristRoutes()
-        {
+        public IEnumerable<TouristRoute> GetTouristRoutes(
+            string keyword,
+            string ratingOperator, 
+            int? ratingValue)
+        { 
             //include vs join(manual) eager load. another is lazyload
-            return _context.TouristRoutes.Include(t=>t.TouristRoutePictures);
+            IQueryable<TouristRoute> result = _context.TouristRoutes.Include(t => t.TouristRoutePictures);//generate sql, not for database exec
+            if (!string.IsNullOrWhiteSpace(keyword)) {
+                keyword = keyword.Trim();
+                result = result.Where(t => t.Title.Contains(keyword));//where function to generate sql 
+            }
+            if (ratingValue >= 0)
+            {
+                result = ratingOperator switch
+                {
+                    "largerThan" => result.Where(t => t.Rating >= ratingValue),
+                    "lessThan" => result.Where(t => t.Rating <= ratingValue),
+                    _ => result.Where(t => t.Rating == ratingValue),
+                };
+            }
+
+            return result.ToList();//tolist is iqueryable's function, exec database access right way, then get data from database.
         }
 
         public bool TouristRouteExist(Guid touristRouteId)

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using MyFakexiecheng.Dtos;
 using MyFakexiecheng.Services;
 using AutoMapper;
+using System.Text.RegularExpressions;
+using FakeXiecheng.API.ResourceParameters;
 
 namespace MyFakexiecheng.Controllers
 {
@@ -21,11 +23,28 @@ namespace MyFakexiecheng.Controllers
             _touristRouteRepository = touristRouteRepository;
             _mapper = mapper;
         }
+
+        //api/touristroutes?keyword=......
         [HttpGet]
         [HttpHead]
-        public IActionResult GetTouristRoutes()
+        public IActionResult GetTouristRoutes(
+            [FromQuery] TouristRouteResourceParamaters paramaters
+            //[FromQuery] string keyword,
+            //string rating//lessthan,largerthan,equalto,lessthan3,largethan2,equalto1
+            )//frombody vs fromQuery(could be omitted when use apicontroller,for better understand, should not omit),
+                                                                        //when keyword is not same, [FromQuery(name="")]
         {
-            var touristRoutesFromRepo = _touristRouteRepository.GetTouristRoutes();
+            //Regex regex = new Regex(@"([A-Za-z0-9\-]+)(\d+)");
+            //string operatorType = "";
+            //int ratingValue = -1;
+            //Match match = regex.Match(paramaters.Rating);
+            //if (match.Success)
+            //{
+            //    operatorType = match.Groups[1].Value;
+            //    ratingValue = Int32.Parse(match.Groups[2].Value);
+            //}
+
+            var touristRoutesFromRepo = _touristRouteRepository.GetTouristRoutes(paramaters.Keyword, paramaters.RatingOperator, paramaters.RatingValue);
             if(touristRoutesFromRepo==null|| touristRoutesFromRepo.Count()<=0)
             {
                 return NotFound("no routes found!");
