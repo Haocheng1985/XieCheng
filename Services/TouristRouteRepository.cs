@@ -12,28 +12,29 @@ namespace MyFakexiecheng.Services
     {
         private readonly AppDbContext _context;
 
-        public TouristRouteRepository(AppDbContext context)
+        public TouristRouteRepository(AppDbContext appDbContext)
         {
-            _context = context;
+            _context = appDbContext;
         }
 
-        
-
-        public TouristRoute GetTouristRoute(Guid touristRouteId)
+        public async Task<TouristRoute> GetTouristRouteAsync(Guid touristRouteId)
         {
-            return _context.TouristRoutes.Include(t => t.TouristRoutePictures).FirstOrDefault(n => n.Id == touristRouteId);
+            return await _context.TouristRoutes.Include(t => t.TouristRoutePictures).FirstOrDefaultAsync(n => n.Id == touristRouteId);
         }
 
-        public IEnumerable<TouristRoute> GetTouristRoutes(
+        public async Task<IEnumerable<TouristRoute>> GetTouristRoutesAsync(
             string keyword,
-            string ratingOperator, 
-            int? ratingValue)
-        { 
-            //include vs join(manual) eager load. another is lazyload
-            IQueryable<TouristRoute> result = _context.TouristRoutes.Include(t => t.TouristRoutePictures);//generate sql, not for database exec
-            if (!string.IsNullOrWhiteSpace(keyword)) {
+            string ratingOperator,
+            int? ratingValue
+        )
+        {
+            IQueryable<TouristRoute> result = _context
+                .TouristRoutes
+                .Include(t => t.TouristRoutePictures);
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
                 keyword = keyword.Trim();
-                result = result.Where(t => t.Title.Contains(keyword));//where function to generate sql 
+                result = result.Where(t => t.Title.Contains(keyword));
             }
             if (ratingValue >= 0)
             {
@@ -44,23 +45,29 @@ namespace MyFakexiecheng.Services
                     _ => result.Where(t => t.Rating == ratingValue),
                 };
             }
-
-            return result.ToList();//tolist is iqueryable's function, exec database access right way, then get data from database.
+            // include vs join
+            return await result.ToListAsync();
         }
 
-        public bool TouristRouteExists(Guid touristRouteId)
+        public async Task<bool> TouristRouteExistsAsync(Guid touristRouteId)
         {
-            return _context.TouristRoutes.Any(t => t.Id == touristRouteId);
-        }
-        
-        public IEnumerable<TouristRoutePicture> GetPicturesByTouristRouteId(Guid touristRouteId)
-        {
-            return _context.TouristRoutePictures.Where(p => p.TouristRouteId == touristRouteId).ToList();
+            return await _context.TouristRoutes.AnyAsync(t => t.Id == touristRouteId);
         }
 
-        public TouristRoutePicture GetPicture(int pictureId)
+        public async Task<IEnumerable<TouristRoutePicture>> GetPicturesByTouristRouteIdAsync(Guid touristRouteId)
         {
-            return _context.TouristRoutePictures.Where(p => p.Id == pictureId).FirstOrDefault();
+            return await _context.TouristRoutePictures
+                .Where(p => p.TouristRouteId == touristRouteId).ToListAsync();
+        }
+
+        public async Task<TouristRoutePicture> GetPictureAsync(int pictureId)
+        {
+            return await _context.TouristRoutePictures.Where(p => p.Id == pictureId).FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<TouristRoute>> GetTouristRoutesByIDListAsync(IEnumerable<Guid> ids)
+        {
+            return await _context.TouristRoutes.Where(t => ids.Contains(t.Id)).ToListAsync();
         }
 
         public void AddTouristRoute(TouristRoute touristRoute)
@@ -71,11 +78,6 @@ namespace MyFakexiecheng.Services
             }
             _context.TouristRoutes.Add(touristRoute);
             //_context.SaveChanges();
-        }
-
-        public bool Save()
-        {
-            return (_context.SaveChanges() >= 0);//save data to database
         }
 
         public void AddTouristRoutePicture(Guid touristRouteId, TouristRoutePicture touristRoutePicture)
@@ -99,9 +101,7 @@ namespace MyFakexiecheng.Services
 
         public void DeleteTouristRoutePicture(TouristRoutePicture picture)
         {
-            
-                _context.TouristRoutePictures.Remove(picture);
-            
+            _context.TouristRoutePictures.Remove(picture);
         }
 
         public void DeleteTouristRoutes(IEnumerable<TouristRoute> touristRoutes)
@@ -109,9 +109,10 @@ namespace MyFakexiecheng.Services
             _context.TouristRoutes.RemoveRange(touristRoutes);
         }
 
-        public IEnumerable<TouristRoute> GetTouristRoutesByIDList(IEnumerable<Guid> ids)
+        public async Task<bool> SaveAsync()
         {
-            return _context.TouristRoutes.Where(t => ids.Contains(t.Id)).ToList();
+            return (await _context.SaveChangesAsync() >= 0);
         }
+
     }
 }
