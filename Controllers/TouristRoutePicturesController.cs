@@ -84,5 +84,23 @@ namespace MyFakexiecheng.Controllers
                 pictureToReturn
             );
         }
+
+        [HttpDelete("{pictureId}")]
+        public IActionResult DeletePicture(
+            [FromRoute] Guid touristRouteId,
+            [FromRoute] int pictureId
+        )
+        {
+            if (!_touristRouteRepository.TouristRouteExists(touristRouteId))
+            {
+                return NotFound("旅游线路不存在");
+            }
+
+            var picture = _touristRouteRepository.GetPicture(pictureId);
+            _touristRouteRepository.DeleteTouristRoutePicture(picture);
+            _touristRouteRepository.Save();
+
+            return NoContent();
+        }
     }
 }

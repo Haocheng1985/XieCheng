@@ -16,6 +16,11 @@ namespace MyFakexiecheng.Services
         TouristRoutePicture GetPicture(int pictureId);
         void AddTouristRoute(TouristRoute touristRoute);
         void AddTouristRoutePicture(Guid touristRouteId, TouristRoutePicture touristRoutePicture);
+        void DeleteTouristRoute(TouristRoute touristRoute);
+        void DeleteTouristRoutePicture(TouristRoutePicture picture);
+        IEnumerable<TouristRoute> GetTouristRoutesByIDList(IEnumerable<Guid> ids);
+        void DeleteTouristRoutes(IEnumerable<TouristRoute> touristRoutes);
+
         bool Save();
     }
 }
