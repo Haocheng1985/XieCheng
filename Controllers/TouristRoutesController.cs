@@ -10,6 +10,7 @@ using AutoMapper;
 using System.Text.RegularExpressions;
 using FakeXiecheng.API.ResourceParameters;
 using MyFakexiecheng.Models;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace MyFakexiecheng.Controllers
 {
@@ -98,7 +99,54 @@ namespace MyFakexiecheng.Controllers
                 touristRouteToReture
             );
         }
+        [HttpPut("{touristRouteId}")]
+        public IActionResult UpdateTouristRoute(
+            [FromRoute] Guid touristRouteId,
+            [FromBody] TouristRouteForUpdateDto touristRouteForUpdateDto
+        )
+        {
+            if (!_touristRouteRepository.TouristRouteExists(touristRouteId))
+            {
+                return NotFound("旅游路线找不到");
+            }
 
+            var touristRouteFromRepo = _touristRouteRepository.GetTouristRoute(touristRouteId);
+            // 1. map dto
+            // 2. update dto
+            // 3. map model
+            _mapper.Map(touristRouteForUpdateDto, touristRouteFromRepo);//update profile
+
+            _touristRouteRepository.Save();//8-2 07:00    
+
+            return NoContent();
+        }
+
+        [HttpPatch("{touristRouteId}")]
+        public IActionResult PartiallyUpdateTouristRoute(
+            [FromRoute] Guid touristRouteId,
+            [FromBody] JsonPatchDocument<TouristRouteForUpdateDto> patchDocument//JsonPatchDocument framework
+        )
+        {
+            if (!_touristRouteRepository.TouristRouteExists(touristRouteId))
+            {
+                return NotFound("route not found");
+            }
+
+            var touristRouteFromRepo = _touristRouteRepository.GetTouristRoute(touristRouteId);
+            var touristRouteToPatch = _mapper.Map<TouristRouteForUpdateDto>(touristRouteFromRepo);
+            //patchDocument.ApplyTo(touristRouteToPatch);
+
+            patchDocument.ApplyTo(touristRouteToPatch, ModelState);//modelstate bind to touristRouteToPatch 8-6 3:10
+            if (!TryValidateModel(touristRouteToPatch))
+            {
+                return ValidationProblem(ModelState);
+            }
+
+            _mapper.Map(touristRouteToPatch, touristRouteFromRepo);
+            _touristRouteRepository.Save();
+
+            return NoContent();
+        }
 
     }
 }

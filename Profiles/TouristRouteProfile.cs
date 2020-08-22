@@ -35,7 +35,8 @@ namespace MyFakexiecheng.Profiles
                     opt => opt.MapFrom(src => Guid.NewGuid())
                 );
 
-
+            CreateMap<TouristRouteForUpdateDto, TouristRoute>();
+            CreateMap<TouristRoute, TouristRouteForUpdateDto>();//8-5 04:40
         }
     }
 }
