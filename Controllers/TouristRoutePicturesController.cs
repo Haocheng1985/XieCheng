@@ -26,7 +26,7 @@ namespace MyFakexiecheng.Controllers
         [HttpGet]
         public IActionResult GetPictureListForTouristRoute(Guid touristRouteId)
         {
-            if (!_touristRouteRepository.TouristRouteExist(touristRouteId))
+            if (!_touristRouteRepository.TouristRouteExists(touristRouteId))
             {
                 return NotFound("route not found");
             }
@@ -41,10 +41,10 @@ namespace MyFakexiecheng.Controllers
             
         }
 
-        [HttpGet("{pictureId}")]
+        [HttpGet("{pictureId}",Name = "GetPicture")]
         public IActionResult GetPicture(Guid touristRouteId, int pictureId)
         {
-            if (!_touristRouteRepository.TouristRouteExist(touristRouteId))
+            if (!_touristRouteRepository.TouristRouteExists(touristRouteId))
             {
                 return NotFound("route not found");
             }
@@ -57,6 +57,32 @@ namespace MyFakexiecheng.Controllers
 
             return Ok(_mapper.Map<TouristRoutePictureDto>(pictureFromRepo));
 
+        }
+
+        [HttpPost]
+        public IActionResult CreateTouristRoutePicture(
+            [FromRoute] Guid touristRouteId,
+            [FromBody] TouristRoutePictureForCreationDto touristRoutePictureForCreationDto
+        )
+        {
+            if (!_touristRouteRepository.TouristRouteExists(touristRouteId))
+            {
+                return NotFound("route not exits");
+            }
+
+            var pictureModel = _mapper.Map<TouristRoutePicture>(touristRoutePictureForCreationDto);
+            _touristRouteRepository.AddTouristRoutePicture(touristRouteId, pictureModel);
+            _touristRouteRepository.Save();
+            var pictureToReturn = _mapper.Map<TouristRoutePictureDto>(pictureModel);
+            return CreatedAtRoute(
+                "GetPicture",
+                new
+                {
+                    touristRouteId = pictureModel.TouristRouteId,
+                    pictureId = pictureModel.Id
+                },
+                pictureToReturn
+            );
         }
     }
 }

@@ -48,7 +48,7 @@ namespace MyFakexiecheng.Services
             return result.ToList();//tolist is iqueryable's function, exec database access right way, then get data from database.
         }
 
-        public bool TouristRouteExist(Guid touristRouteId)
+        public bool TouristRouteExists(Guid touristRouteId)
         {
             return _context.TouristRoutes.Any(t => t.Id == touristRouteId);
         }
@@ -61,6 +61,35 @@ namespace MyFakexiecheng.Services
         public TouristRoutePicture GetPicture(int pictureId)
         {
             return _context.TouristRoutePictures.Where(p => p.Id == pictureId).FirstOrDefault();
+        }
+
+        public void AddTouristRoute(TouristRoute touristRoute)
+        {
+            if (touristRoute == null)
+            {
+                throw new ArgumentNullException(nameof(touristRoute));
+            }
+            _context.TouristRoutes.Add(touristRoute);
+            //_context.SaveChanges();
+        }
+
+        public bool Save()
+        {
+            return (_context.SaveChanges() >= 0);//save data to database
+        }
+
+        public void AddTouristRoutePicture(Guid touristRouteId, TouristRoutePicture touristRoutePicture)
+        {
+            if (touristRouteId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(touristRouteId));
+            }
+            if (touristRoutePicture == null)
+            {
+                throw new ArgumentNullException(nameof(touristRoutePicture));
+            }
+            touristRoutePicture.TouristRouteId = touristRouteId;
+            _context.TouristRoutePictures.Add(touristRoutePicture);
         }
     }
 }

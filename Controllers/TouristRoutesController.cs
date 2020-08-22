@@ -9,6 +9,7 @@ using MyFakexiecheng.Services;
 using AutoMapper;
 using System.Text.RegularExpressions;
 using FakeXiecheng.API.ResourceParameters;
+using MyFakexiecheng.Models;
 
 namespace MyFakexiecheng.Controllers
 {
@@ -54,7 +55,7 @@ namespace MyFakexiecheng.Controllers
         }
 
         // api/tourisrtoutes/{touristRouteId}
-        [HttpGet("{touristRouteId}")]// limit guid {touristRouteId:guid}
+        [HttpGet("{touristRouteId}",Name = "GetTouristRouteById")]// limit guid {touristRouteId:guid}
         [HttpHead("{touristRouteId}")]
         public IActionResult GetTouristRouteById(Guid touristRouteId)
         {
@@ -82,6 +83,20 @@ namespace MyFakexiecheng.Controllers
             //};
             var touristRouteDto = _mapper.Map<TouristRouteDto>(touristRouteFromRepo);
             return Ok(touristRouteDto);
+        }
+
+        [HttpPost]
+        public IActionResult CreateTouristRoute([FromBody] TouristRouteForCreationDto touristRouteForCreationDto)//deserialize input info. DTO format ref to TouristRouteDto
+        {
+            var touristRouteModel = _mapper.Map<TouristRoute>(touristRouteForCreationDto);//dto map to model.<target map model>(map data)
+            _touristRouteRepository.AddTouristRoute(touristRouteModel);
+            _touristRouteRepository.Save();
+            var touristRouteToReture = _mapper.Map<TouristRouteDto>(touristRouteModel);
+            return CreatedAtRoute(
+                "GetTouristRouteById",//route api
+                new { touristRouteId = touristRouteToReture.Id },//api 路径参数
+                touristRouteToReture
+            );
         }
 
 

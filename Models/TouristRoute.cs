@@ -30,7 +30,7 @@ namespace MyFakexiecheng.Models
         public string Fees { get; set; }
         [MaxLength]
         public string Notes { get; set; }
-        public ICollection<TouristRoutePicture> TouristRoutePictures { get; set; }
+        public ICollection<TouristRoutePicture> TouristRoutePictures { get; set; }// connection prop
             = new List<TouristRoutePicture>();
 
         public double? Rating { get; set; }

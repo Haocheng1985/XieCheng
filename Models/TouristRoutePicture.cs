@@ -16,6 +16,6 @@ namespace MyFakexiecheng.Models
         public string Url { get; set; }
         [ForeignKey("TouristRouteId")]
         public Guid TouristRouteId { get; set; }
-        public TouristRoute TouristRoute { get; set; }
+        public TouristRoute TouristRoute { get; set; }//connect prop.
     }
 }
