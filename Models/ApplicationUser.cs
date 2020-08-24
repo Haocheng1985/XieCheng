@@ -12,7 +12,7 @@ namespace MyFakexiecheng.Models
         // ShoppingCart
         public ShoppingCart ShoppingCart { get; set; }
 
-        // Order
+        public ICollection<Order> Orders { get; set; }
         //一定要与父类一致
         public virtual ICollection<IdentityUserRole<string>> UserRoles { get; set; }//用户角色，多对多关系11-9 02：50
         //public virtual ICollection<IdentityUserClaim<string>> Claims { get; set; }//与用户绑定的claim

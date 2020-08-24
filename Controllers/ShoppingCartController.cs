@@ -116,5 +116,36 @@ namespace MyFakexiecheng.Controllers
             return NoContent();
         }
 
+        [HttpPost("checkout")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> Checkout()
+        {
+            // 1 获得当前用户
+            var userId = _httpContextAccessor
+                .HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            // 2 使用userid获得购物车
+            var shoppingCart = await _touristRouteRepository.GetShoppingCartByUserId(userId);
+
+            // 3 创建订单
+            var order = new Order()
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                State = OrderStateEnum.Pending,
+                OrderItems = shoppingCart.ShoppingCartItems,
+                CreateDateUTC = DateTime.UtcNow,
+            };
+
+            shoppingCart.ShoppingCartItems = null;
+
+            // 4 保存数据
+            await _touristRouteRepository.AddOrderAsync(order);
+            await _touristRouteRepository.SaveAsync();
+
+            // 5 return
+            return Ok(_mapper.Map<OrderDto>(order));
+        }
+
     }
 }
