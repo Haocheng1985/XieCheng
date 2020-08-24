@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using MyFakexiecheng.Dtos;
 using MyFakexiecheng.Models;
+using MyFakexiecheng.Services;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -24,14 +25,17 @@ namespace MyFakexiecheng.Controllers
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ITouristRouteRepository _touristRouteRepository;
 
         public AuthenticateController(IConfiguration configuration, 
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)//注入依赖
+            SignInManager<ApplicationUser> signInManager,
+            ITouristRouteRepository touristRouteRepository)//注入依赖
         {
             _configuration = configuration;
             _userManager = userManager;
             _signInManager = signInManager;
+            _touristRouteRepository = touristRouteRepository;
         }
 
         [AllowAnonymous]
@@ -107,9 +111,19 @@ namespace MyFakexiecheng.Controllers
                 return BadRequest();
             }
 
-            // 3 return
+            // 3 初始化购物车
+            var shoppingCart = new ShoppingCart()
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id
+            };
+            await _touristRouteRepository.CreateShoppingCart(shoppingCart);
+            await _touristRouteRepository.SaveAsync();
+
+            // 4 return
             return Ok();
         }
+
 
     }
 }

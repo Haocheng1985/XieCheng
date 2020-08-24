@@ -10,6 +10,8 @@ namespace MyFakexiecheng.Models
     {
         public string Address { get; set; }
         // ShoppingCart
+        public ShoppingCart ShoppingCart { get; set; }
+
         // Order
         //一定要与父类一致
         public virtual ICollection<IdentityUserRole<string>> UserRoles { get; set; }//用户角色，多对多关系11-9 02：50
