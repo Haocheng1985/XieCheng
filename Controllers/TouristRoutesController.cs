@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace MyFakexiecheng.Controllers
 {
-    [Route("api/[controller]")]// api/touritsroute
+    [Route("api/[controller]")]// api/touritsroutes
     [ApiController]
     public class TouristRoutesController : ControllerBase//Controller(controller more functions, support view)
     {
@@ -48,7 +48,13 @@ namespace MyFakexiecheng.Controllers
             //    ratingValue = Int32.Parse(match.Groups[2].Value);
             //}
 
-            var touristRoutesFromRepo =await _touristRouteRepository.GetTouristRoutesAsync(paramaters.Keyword, paramaters.RatingOperator, paramaters.RatingValue);//在这里异步等待，在这里挂起，知道数据库返回数据10-3 5：30
+            var touristRoutesFromRepo =await _touristRouteRepository
+                .GetTouristRoutesAsync(paramaters.Keyword, 
+                paramaters.RatingOperator, 
+                paramaters.RatingValue,
+                paramaters.PageNumber,
+                paramaters.PageSize
+                );//在这里异步等待，在这里挂起，直到数据库返回数据10-3 5：30
             if(touristRoutesFromRepo==null|| touristRoutesFromRepo.Count()<=0)
             {
                 return NotFound("no routes found!");

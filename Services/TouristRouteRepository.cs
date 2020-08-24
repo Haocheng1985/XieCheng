@@ -4,6 +4,7 @@ using MyFakexiecheng.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace MyFakexiecheng.Services
@@ -25,7 +26,10 @@ namespace MyFakexiecheng.Services
         public async Task<IEnumerable<TouristRoute>> GetTouristRoutesAsync(
             string keyword,
             string ratingOperator,
-            int? ratingValue
+            int? ratingValue,
+            int pageSize,
+            int pageNumber
+
         )
         {
             IQueryable<TouristRoute> result = _context
@@ -45,6 +49,13 @@ namespace MyFakexiecheng.Services
                     _ => result.Where(t => t.Rating == ratingValue),
                 };
             }
+            //pagination
+            var skip = (pageNumber - 1) * pageSize;
+            result = result.Skip(skip);
+            //以pagesize为标准显示一定量的数据
+            result = result.Take(pageSize);
+
+
             // include vs join
             return await result.ToListAsync();
         }
