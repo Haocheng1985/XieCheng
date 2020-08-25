@@ -51,6 +51,7 @@ namespace MyFakexiecheng.Controllers
                 ResourceUriType.PreviousPage => _urlHelper.Link("GetTouristRoutes",
                     new
                     {
+                        fields = paramaters.Fields,
                         orderBy = paramaters.OrderBy,
                         keyword = paramaters.Keyword,
                         rating = paramaters.Rating,
@@ -60,6 +61,7 @@ namespace MyFakexiecheng.Controllers
                 ResourceUriType.NextPage => _urlHelper.Link("GetTouristRoutes",
                     new
                     {
+                        fields = paramaters.Fields,
                         orderBy = paramaters.OrderBy,
                         keyword = paramaters.Keyword,
                         rating = paramaters.Rating,
@@ -69,6 +71,7 @@ namespace MyFakexiecheng.Controllers
                 _ => _urlHelper.Link("GetTouristRoutes",
                     new
                     {
+                        fields = paramaters.Fields,
                         orderBy = paramaters.OrderBy,
                         keyword = paramaters.Keyword,
                         rating = paramaters.Rating,
@@ -103,6 +106,11 @@ namespace MyFakexiecheng.Controllers
                 paramaters.OrderBy))
             {
                 return BadRequest("请输入正确的排序参数");
+            }
+            if (!_propertyMappingService
+                .IsPropertiesExists<TouristRouteDto>(paramaters.Fields))
+            {
+                return BadRequest("请输入正确的塑性参数");
             }
 
             var touristRoutesFromRepo =await _touristRouteRepository
@@ -144,13 +152,13 @@ namespace MyFakexiecheng.Controllers
                 Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
 
 
-            return Ok(touristRouteDto);
+            return Ok(touristRouteDto.ShapeData(paramaters.Fields));
         }
 
         // api/tourisrtoutes/{touristRouteId}
         [HttpGet("{touristRouteId}",Name = "GetTouristRouteById")]// limit guid {touristRouteId:guid}
         [HttpHead("{touristRouteId}")]
-        public async Task<IActionResult> GetTouristRouteById(Guid touristRouteId)
+        public async Task<IActionResult> GetTouristRouteById(Guid touristRouteId, string fields)
         {
 
             var touristRouteFromRepo =await _touristRouteRepository.GetTouristRouteAsync(touristRouteId);
@@ -175,7 +183,7 @@ namespace MyFakexiecheng.Controllers
             //    DepartureCity = touristRouteFromRepo.DepartureCity.ToString()
             //};
             var touristRouteDto = _mapper.Map<TouristRouteDto>(touristRouteFromRepo);
-            return Ok(touristRouteDto);
+            return Ok(touristRouteDto.ShapeData(fields));
         }
 
         [HttpPost]
