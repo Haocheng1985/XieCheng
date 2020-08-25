@@ -26,15 +26,18 @@ namespace MyFakexiecheng.Controllers
         private ITouristRouteRepository _touristRouteRepository;
         private readonly IMapper _mapper;
         private readonly IUrlHelper _urlHelper;
+        private readonly IPropertyMappingService _propertyMappingService;
         public TouristRoutesController(ITouristRouteRepository touristRouteRepository,
             IMapper mapper,
             IUrlHelperFactory urlHelperFactory,
-            IActionContextAccessor actionContextAccessor
+            IActionContextAccessor actionContextAccessor,
+            IPropertyMappingService propertyMappingService
             )
         {
             _touristRouteRepository = touristRouteRepository;
             _mapper = mapper;
             _urlHelper = urlHelperFactory.GetUrlHelper(actionContextAccessor.ActionContext);
+            _propertyMappingService = propertyMappingService;
         }
 
         private string GenerateTouristRouteResourceURL(
@@ -48,6 +51,7 @@ namespace MyFakexiecheng.Controllers
                 ResourceUriType.PreviousPage => _urlHelper.Link("GetTouristRoutes",
                     new
                     {
+                        orderBy = paramaters.OrderBy,
                         keyword = paramaters.Keyword,
                         rating = paramaters.Rating,
                         pageNumber = paramaters2.PageNumber - 1,
@@ -56,6 +60,7 @@ namespace MyFakexiecheng.Controllers
                 ResourceUriType.NextPage => _urlHelper.Link("GetTouristRoutes",
                     new
                     {
+                        orderBy = paramaters.OrderBy,
                         keyword = paramaters.Keyword,
                         rating = paramaters.Rating,
                         pageNumber = paramaters2.PageNumber + 1,
@@ -64,6 +69,7 @@ namespace MyFakexiecheng.Controllers
                 _ => _urlHelper.Link("GetTouristRoutes",
                     new
                     {
+                        orderBy = paramaters.OrderBy,
                         keyword = paramaters.Keyword,
                         rating = paramaters.Rating,
                         pageNumber = paramaters2.PageNumber,
@@ -92,13 +98,20 @@ namespace MyFakexiecheng.Controllers
             //    operatorType = match.Groups[1].Value;
             //    ratingValue = Int32.Parse(match.Groups[2].Value);
             //}
+            if (!_propertyMappingService
+                .IsMappingExists<TouristRouteDto, TouristRoute>(
+                paramaters.OrderBy))
+            {
+                return BadRequest("请输入正确的排序参数");
+            }
 
             var touristRoutesFromRepo =await _touristRouteRepository
                 .GetTouristRoutesAsync(paramaters.Keyword, 
                 paramaters.RatingOperator, 
                 paramaters.RatingValue,
                 paramaters2.PageSize,
-                paramaters2.PageNumber
+                paramaters2.PageNumber,
+                paramaters.OrderBy
                 );//在这里异步等待，在这里挂起，直到数据库返回数据10-3 5：30
             if(touristRoutesFromRepo==null|| touristRoutesFromRepo.Count()<=0)
             {

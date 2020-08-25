@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyFakexiecheng.Database;
+using MyFakexiecheng.Dtos;
 using MyFakexiecheng.Helper;
 using MyFakexiecheng.Models;
 using System;
@@ -13,10 +14,12 @@ namespace MyFakexiecheng.Services
     public class TouristRouteRepository : ITouristRouteRepository
     {
         private readonly AppDbContext _context;
+        private readonly IPropertyMappingService _propertyMappingService;
 
-        public TouristRouteRepository(AppDbContext appDbContext)
+        public TouristRouteRepository(AppDbContext appDbcontext, IPropertyMappingService propertyMappingService)
         {
-            _context = appDbContext;
+            _context = appDbcontext;
+            _propertyMappingService = propertyMappingService;
         }
 
         public async Task<TouristRoute> GetTouristRouteAsync(Guid touristRouteId)
@@ -29,7 +32,8 @@ namespace MyFakexiecheng.Services
             string ratingOperator,
             int? ratingValue,
             int pageSize,
-            int pageNumber
+            int pageNumber,
+            string orderBy
 
         )
         {
@@ -55,6 +59,22 @@ namespace MyFakexiecheng.Services
             //result = result.Skip(skip);
             //以pagesize为标准显示一定量的数据
             //result = result.Take(pageSize);
+
+            if (!string.IsNullOrWhiteSpace(orderBy))
+            {
+                //if (orderBy.ToLowerInvariant() == "originalprice")
+                //{
+                //    result = result.OrderBy(t => t.OriginalPrice);
+                //}
+
+                var touristRouteMappingDictionary = _propertyMappingService
+                    .GetPropertyMapping<TouristRouteDto, TouristRoute>();
+
+                result = result.ApplySort(orderBy, touristRouteMappingDictionary);
+
+
+                //result.ApplySort(orderBy, _mappingDictionary);
+            }
 
 
             // include vs join

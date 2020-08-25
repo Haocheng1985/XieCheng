@@ -96,6 +96,7 @@ namespace MyFakexiecheng
             });
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());//scan profile 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddTransient<IPropertyMappingService, PropertyMappingService>();
 
         }
 
