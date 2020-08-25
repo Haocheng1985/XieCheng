@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyFakexiecheng.Dtos;
+using MyFakexiecheng.ResourceParameters;
 using MyFakexiecheng.Services;
 using System;
 using System.Collections.Generic;
@@ -32,14 +33,15 @@ namespace MyFakexiecheng.Controllers
         }
         [HttpGet]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<IActionResult> GetOrders()
+        public async Task<IActionResult> GetOrders(
+            [FromQuery] PaginationResourceParamaters paramaters)
         {
             // 1. 获得当前用户
             var userId = _httpContextAccessor
                 .HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             // 2. 使用用户id来获取订单历史记录
-            var orders = await _touristRouteRepository.GetOrdersByUserId(userId);
+            var orders = await _touristRouteRepository.GetOrdersByUserId(userId,paramaters.PageSize,paramaters.PageNumber);
 
             return Ok(_mapper.Map<IEnumerable<OrderDto>>(orders));
         }

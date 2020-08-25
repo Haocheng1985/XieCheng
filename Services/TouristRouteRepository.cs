@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyFakexiecheng.Database;
+using MyFakexiecheng.Helper;
 using MyFakexiecheng.Models;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace MyFakexiecheng.Services
             return await _context.TouristRoutes.Include(t => t.TouristRoutePictures).FirstOrDefaultAsync(n => n.Id == touristRouteId);
         }
 
-        public async Task<IEnumerable<TouristRoute>> GetTouristRoutesAsync(
+        public async Task<PaginationList<TouristRoute>> GetTouristRoutesAsync(
             string keyword,
             string ratingOperator,
             int? ratingValue,
@@ -50,14 +51,14 @@ namespace MyFakexiecheng.Services
                 };
             }
             //pagination
-            var skip = (pageNumber - 1) * pageSize;
-            result = result.Skip(skip);
+            //var skip = (pageNumber - 1) * pageSize;//实现helper类以后不使用了
+            //result = result.Skip(skip);
             //以pagesize为标准显示一定量的数据
-            result = result.Take(pageSize);
+            //result = result.Take(pageSize);
 
 
             // include vs join
-            return await result.ToListAsync();
+            return await PaginationList<TouristRoute>.CreateAsync(pageNumber, pageSize, result);
         }
 
         public async Task<bool> TouristRouteExistsAsync(Guid touristRouteId)
@@ -174,9 +175,11 @@ namespace MyFakexiecheng.Services
             await _context.Orders.AddAsync(order);
         }
 
-        public async Task<IEnumerable<Order>> GetOrdersByUserId(string userId)
+        public async Task<PaginationList<Order>> GetOrdersByUserId(string userId,int pageSize,int pageNumber)
         {
-            return await _context.Orders.Where(o => o.UserId == userId).ToListAsync();
+            //return await _context.Orders.Where(o => o.UserId == userId).ToListAsync();
+            IQueryable<Order> result = _context.Orders.Where(o => o.UserId == userId);
+            return await PaginationList<Order>.CreateAsync(pageNumber, pageSize, result);
         }
 
         public async Task<Order> GetOrderById(Guid orderId)

@@ -20,6 +20,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using MyFakexiecheng.Models;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace MyFakexiecheng
 {
@@ -94,6 +95,7 @@ namespace MyFakexiecheng
                 options.UseSqlServer(Configuration["DbContext:ConnectionString"]);
             });
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());//scan profile 
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
         }
 
