@@ -31,7 +31,7 @@ namespace MyFakexiecheng.Controllers
             _touristRouteRepository = touristRouteRepository;
             _mapper = mapper;
         }
-        [HttpGet]
+        [HttpGet(Name = "GetOrders")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetOrders(
             [FromQuery] PaginationResourceParamaters paramaters)

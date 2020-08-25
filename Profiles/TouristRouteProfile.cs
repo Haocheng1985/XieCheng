@@ -37,6 +37,12 @@ namespace MyFakexiecheng.Profiles
 
             CreateMap<TouristRouteForUpdateDto, TouristRoute>();
             CreateMap<TouristRoute, TouristRouteForUpdateDto>();//8-5 04:40
+
+            CreateMap<TouristRoute, TouristRouteSimplifyDto>()
+                .ForMember(
+                    dest => dest.Price,
+                    opt => opt.MapFrom(src => src.OriginalPrice * (decimal)(src.DiscountPresent ?? 1))
+                );
         }
     }
 }

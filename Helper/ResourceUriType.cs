@@ -8,6 +8,7 @@ namespace MyFakexiecheng.Helper
     public enum ResourceUriType
     {
         PreviousPage,
-        NextPage
+        NextPage,
+        CurrnetPage
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyFakexiecheng.Dtos;
 using MyFakexiecheng.Models;
@@ -23,7 +24,7 @@ namespace MyFakexiecheng.Controllers
             _mapper = mapper??
                 throw new ArgumentException(nameof(mapper)); 
         }
-        [HttpGet]
+        [HttpGet(Name = "GetPictureListForTouristRouteAsync")]
         public async Task<IActionResult> GetPictureListForTouristRouteAsync(Guid touristRouteId)
         {
             if (!(await _touristRouteRepository.TouristRouteExistsAsync(touristRouteId)))
@@ -59,7 +60,9 @@ namespace MyFakexiecheng.Controllers
 
         }
 
-        [HttpPost]
+        [HttpPost(Name = "CreateTouristRoutePicture")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateTouristRoutePicture(
             [FromRoute] Guid touristRouteId,
             [FromBody] TouristRoutePictureForCreationDto touristRoutePictureForCreationDto
@@ -86,6 +89,8 @@ namespace MyFakexiecheng.Controllers
         }
 
         [HttpDelete("{pictureId}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeletePicture(
             [FromRoute] Guid touristRouteId,
             [FromRoute] int pictureId

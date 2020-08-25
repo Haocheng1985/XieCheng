@@ -33,7 +33,7 @@ namespace MyFakexiecheng.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet(Name = "GetShoppingCart")]
         [Authorize(AuthenticationSchemes = "Bearer")]//获取私有资源
         public async Task<IActionResult> GetShoppingCart()
         {

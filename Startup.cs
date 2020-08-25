@@ -21,6 +21,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using MyFakexiecheng.Models;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace MyFakexiecheng
 {
@@ -97,6 +98,19 @@ namespace MyFakexiecheng
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());//scan profile 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
+
+
+            services.Configure<MvcOptions>(config =>
+            {
+                var outputFormatter = config.OutputFormatters
+                    .OfType<NewtonsoftJsonOutputFormatter>()?.FirstOrDefault();
+
+                if (outputFormatter != null)
+                {
+                    outputFormatter.SupportedMediaTypes
+                    .Add("application/vnd.aleks.hateoas+json");
+                }
+            });//全局添加自定义媒体类型
 
         }
 
